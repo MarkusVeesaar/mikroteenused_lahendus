@@ -1,0 +1,27 @@
+{
+  "name": "Mikroteenused",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker": {
+      "version": "latest"
+    }
+  },
+  "forwardPorts": [8080, 8081, 8082],
+  "portsAttributes": {
+    "8080": {
+      "label": "loans-service",
+      "onAutoForward": "openBrowser"
+    },
+    "8081": {
+      "label": "items-service"
+    },
+    "8082": {
+      "label": "notifications-service"
+    }
+  },
+  "postCreateCommand": "test -f .env || cp .env.example .env",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-azuretools.vscode-docker"]
+    }
+  }
+}
