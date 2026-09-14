@@ -23,10 +23,22 @@ final class Request
         $path = rtrim($uri, '/') ?: '/';
 
         $headers = [];
+
+        if (function_exists('getallheaders')) {
+            $allHeaders = getallheaders();
+            if (is_array($allHeaders)) {
+                foreach ($allHeaders as $name => $value) {
+                    $headers[(string) $name] = (string) $value;
+                    $normalized = str_replace(' ', '-', ucwords(strtolower(str_replace(['_', '-'], ' ', (string) $name))));
+                    $headers[$normalized] = (string) $value;
+                }
+            }
+        }
+
         foreach ($_SERVER as $key => $value) {
             if (str_starts_with($key, 'HTTP_')) {
                 $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
-                $headers[$name] = $value;
+                $headers[$name] = (string) $value;
             }
         }
 
@@ -34,16 +46,25 @@ final class Request
             $headers['Content-Type'] = $_SERVER['CONTENT_TYPE'];
         }
 
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $headers['Authorization'] = (string) $_SERVER['HTTP_AUTHORIZATION'];
+        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            $headers['Authorization'] = (string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+
         $rawBody = file_get_contents('php://input') ?: '';
         $body = [];
-        if ($rawBody !== '' && str_contains($headers['Content-Type'] ?? '', 'application/json')) {
+        $contentType = $headers['Content-Type'] ?? '';
+        if ($rawBody !== '' && str_contains($contentType, 'application/json')) {
             $decoded = json_decode($rawBody, true);
             if (is_array($decoded)) {
                 $body = $decoded;
             }
         }
 
-        $requestId = $headers['X-Request-Id'] ?? ('req-' . bin2hex(random_bytes(4)));
+        $requestId = $headers['X-Request-Id']
+            ?? ($headers['x-request-id'] ?? null)
+            ?? ('req-' . bin2hex(random_bytes(4)));
 
         return new self(
             method: $method,
@@ -55,9 +76,20 @@ final class Request
         );
     }
 
+    public function header(string $name, ?string $default = null): ?string
+    {
+        foreach ($this->headers as $key => $val) {
+            if (strcasecmp((string) $key, $name) === 0) {
+                return (string) $val;
+            }
+        }
+
+        return $default;
+    }
+
     public function bearerToken(): ?string
     {
-        $auth = $this->headers['Authorization'] ?? null;
+        $auth = $this->header('Authorization') ?? $this->headers['Authorization'] ?? null;
         if ($auth === null || !str_starts_with($auth, 'Bearer ')) {
             return null;
         }
