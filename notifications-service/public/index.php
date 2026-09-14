@@ -17,7 +17,7 @@ $requireInternalKey = static function (Request $req): void {
         throw new AuthException('SERVICE_MISCONFIGURED', 'Sisemine API võti on seadistamata', 503);
     }
 
-    $provided = $req->headers['X-Internal-Api-Key'] ?? null;
+    $provided = $req->header('X-Internal-Api-Key') ?? $req->headers['X-Internal-Api-Key'] ?? null;
     if ($provided !== $expected) {
         throw new AuthException('UNAUTHORIZED', 'Puudub volitus', 401);
     }
