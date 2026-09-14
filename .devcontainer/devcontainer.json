@@ -19,6 +19,7 @@
     }
   },
   "postCreateCommand": "test -f .env || cp .env.example .env",
+  "postStartCommand": "sudo sysctl -w net.bridge.bridge-nf-call-iptables=0 2>/dev/null; sudo iptables-legacy -P FORWARD ACCEPT 2>/dev/null || true",
   "customizations": {
     "vscode": {
       "extensions": ["ms-azuretools.vscode-docker"]

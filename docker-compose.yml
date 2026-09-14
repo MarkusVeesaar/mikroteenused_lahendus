@@ -59,6 +59,7 @@ services:
 
   loans-db:
     image: mysql:8
+    command: --bind-address=0.0.0.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
       MYSQL_DATABASE: loans_db
@@ -74,6 +75,7 @@ services:
 
   items-db:
     image: mysql:8
+    command: --bind-address=0.0.0.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
       MYSQL_DATABASE: items_db
@@ -89,6 +91,7 @@ services:
 
   notifications-db:
     image: mysql:8
+    command: --bind-address=0.0.0.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
       MYSQL_DATABASE: notifications_db

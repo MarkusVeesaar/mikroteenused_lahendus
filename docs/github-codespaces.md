@@ -64,6 +64,7 @@ Codespaces edastab localhost pordid automaatselt. Brauseris avatud URL kasutab G
 | `Cannot connect to the Docker daemon` | Oota devcontaineri täielikku käivitumist; taaskäivita Codespace vajadusel. |
 | `.env` puudub | `cp .env.example .env` |
 | Port 8080 ei vasta | `docker compose ps`; oota MySQL healthcheck’i; vaata `docker compose logs loans-service` |
+| Sisselogimisel "Sisemine viga" / DB timeout | Käivita `sudo sysctl -w net.bridge.bridge-nf-call-iptables=0` ja `sudo iptables-legacy -P FORWARD ACCEPT` (Codespaces devcontaineri võrgusilla pakettide lubamiseks). |
 | Build ebaõnnestub | `docker compose build --no-cache` ja uuesti `up -d` |
 
 ## Peatamine
