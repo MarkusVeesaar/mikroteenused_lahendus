@@ -18,5 +18,4 @@ CREATE TABLE loans (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_loans_user ON loans(user_id);
 CREATE INDEX idx_loans_item ON loans(item_id);

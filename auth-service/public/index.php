@@ -58,14 +58,11 @@ $router->get('/health', static function (Request $req) {
     Response::json(['status' => 'ok', 'service' => 'loans'], 200, $req->requestId);
 });
 
-$router->post('/auth/login', static function (Request $req) use ($handleException) {
+$router->post('/auth/login', static function (Request $req) use ($authService, $handleException) {
     try {
-        $client = new HttpClient(
-            Config::get('AUTH_SERVICE_URL', 'http://auth-service'),
-            null,
-            $req->requestId,
-        );
-        $result = $client->postJson('/auth/login', $req->body);
+        $email = (string) ($req->body['email'] ?? '');
+        $password = (string) ($req->body['password'] ?? '');
+        $result = $authService->login($email, $password);
         Response::json($result, 200, $req->requestId);
     } catch (Throwable $e) {
         $handleException($e);
